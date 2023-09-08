@@ -1,0 +1,13 @@
+{
+    "token": "discord token",
+    "mqtt": "mqtt://localhost",
+    "wirelessMap": {
+	"TG": "Craft Room",
+	"TF": "Kitchen",
+	"TB": "Electronics & 3D Printing",
+	"TE": "Studio",
+	"TC": "Classroom",
+	"TA": "Blue Room",
+	"TD": "Workshop"
+    }
+}

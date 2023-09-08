@@ -1,0 +1,23 @@
+{
+  "name": "nh-discord",
+  "version": "0.1.0",
+  "description": "A discord bot for nottingham hackspace",
+  "main": "main.js",
+  "scripts": {
+    "test": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AaronJackson/nh-discord.git"
+  },
+  "author": "Aaron Jackson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AaronJackson/nh-discord/issues"
+  },
+  "homepage": "https://github.com/AaronJackson/nh-discord#readme",
+  "dependencies": {
+    "discord.js": "^14.13.0",
+    "mqtt": "^5.0.5"
+  }
+}
