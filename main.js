@@ -43,13 +43,12 @@ mqttClient.on('connect', function () {
     });
 
     commands.forEach(command => {
+	command.discordClient = discordClient;
 	command.mqttClient = mqttClient;
     });
 })
 
 mqttClient.on('message', function (topic, message) {
-    console.log(`${topic} : ${message}`);
-
     commands.forEach(command => {
 	command.onMqttMessage(topic, message);
     });
