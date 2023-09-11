@@ -15,6 +15,7 @@
 	"nh/temperature/#",
 	"nh/bookings/#",
 	"nh/status/res/#",
-	"nh/llap/messagebridge/listen"
+	"nh/llap/messagebridge/listen",
+	"nh/gk/DoorButton"
     ]
 }
