@@ -152,27 +152,12 @@ Hello! I'm Nottinghack Bot. Here is a list of commands
 
 
 mqttClient.on('connect', function () {
-    mqttClient.subscribe('nh/temperature/#', function (err) {
-	if (!err) {
-	    // mqttClient.publish('presence', 'Hello mqtt')
-	}
+    conf.mqttSubscriptions.forEach(topic => {
+	mqttClient.subscribe(topic, e => {
+	    if (!e) return;
+	    console.log(`failed to subscribe to ${topic}`);
+	});
     });
-
-    mqttClient.subscribe('nh/bookings/#', function (err) {
-
-    });
-
-    mqttClient.subscribe('nh/status/res', function (err) {
-
-    });
-
-    mqttClient.subscribe('nh/llap/messagebridge/listen', function (err) {
-
-    });
-
-    // mqttClient.subscribe('nh/#', function (err) {
-
-    // });
 })
 
 mqttClient.on('message', function (topic, message) {

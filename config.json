@@ -10,5 +10,11 @@
 	"TA": "Blue Room",
 	"TD": "Workshop",
 	"TH": "Comfy Area"
-    }
+    },
+    "mqttSubscriptions": [
+	"nh/temperature/#",
+	"nh/bookings/#",
+	"nh/status/res/#",
+	"nh/llap/messagebridge/listen"
+    ]
 }
