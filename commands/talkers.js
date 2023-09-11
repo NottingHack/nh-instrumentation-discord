@@ -8,14 +8,16 @@ module.exports = function () {
 	if (!topic.startsWith('nh/urchin/said') &&
 	    !topic.startsWith('nh/donationbot/said')) return;
 
-	const channel = this.discordClient
-	      .channels.cache.find(channel => channel.name === 'public');
-
 	const sender = topic.includes('donationbot') ? '🤖 Donationbot' : '🧒 Urchin';
-	channel.send({
-	    content: `${sender}: ${message}`,
-	    flags: [ 4096 ] // silenced
-	});
+	this.discordClient
+	    .channels.fetch(conf.notificationChannel)
+	    .then(channel => {
+		channel.send({
+		    content: `${sender}: ${message}`,
+		    flags: [ 4096 ] // silenced
+		});
+	    });
+
     };
 
     this.onDiscordMessage = (message) => {

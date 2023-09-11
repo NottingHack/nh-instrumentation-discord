@@ -19,5 +19,6 @@
 	"nh/gk/DoorButton",
 	"nh/urchin/said",
 	"nh/donationbot/said"
-    ]
+    ],
+    "notificationChannel": "1016848186540822540"
 }
