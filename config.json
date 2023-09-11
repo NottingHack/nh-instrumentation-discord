@@ -16,6 +16,8 @@
 	"nh/bookings/#",
 	"nh/status/res/#",
 	"nh/llap/messagebridge/listen",
-	"nh/gk/DoorButton"
+	"nh/gk/DoorButton",
+	"nh/urchin/said",
+	"nh/donationbot/said"
     ]
 }
