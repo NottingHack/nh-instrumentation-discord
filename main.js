@@ -161,6 +161,8 @@ mqttClient.on('connect', function () {
 })
 
 mqttClient.on('message', function (topic, message) {
+    console.log(`${topic} : ${message}`);
+
     if (topic.startsWith('nh/temperature/')) {
 	const room = topic.split('/').pop()
 	temperature[room] = parseFloat(message.toString());
@@ -220,15 +222,6 @@ mqttClient.on('message', function (topic, message) {
 	}
     }
 });
-
-// setInterval(function () {
-//     if (histTemperature.length >= 60)
-// 	histTemperature.shift();
-//     histTemperature.push({ ...temperature}); // clone
-
-//     console.log(histTemperature);
-// }, 1000);
-
 
 // Log in to Discord with your client's token
 discordClient.login(conf.token);
