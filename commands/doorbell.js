@@ -10,7 +10,10 @@ module.exports = function () {
 	const channel = this.discordClient
 	      .channels.cache.find(channel => channel.name === 'public');
 
-	channel.send(`🔔 Doorbell ${message}`);
+	channel.send({
+	    content: `🔔 Doorbell ${message}`,
+	    flags: [ 4096 ] // silenced
+	});
     };
 
     this.onDiscordMessage = (message) => {
