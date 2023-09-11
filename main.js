@@ -46,8 +46,9 @@ Hello! I'm Nottinghack Bot. Here is a list of commands
     }
 
     if (message.content.startsWith("!temp")) {
-	// calculate average
 	const values = Object.values(temperature);
+	if (values.length == 0) return; // we're not ready
+
 	const mean = (values.reduce((acc, cur) => acc + cur) / values.length).toFixed(2);
 
 	var tempEmbed = new EmbedBuilder()
