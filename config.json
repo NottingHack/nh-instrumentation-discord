@@ -18,7 +18,9 @@
 	"nh/llap/messagebridge/listen",
 	"nh/gk/DoorButton",
 	"nh/urchin/said",
-	"nh/donationbot/said"
+	"nh/donationbot/said",
+	"nh/discord/#"
     ],
-    "notificationChannel": "1016848186540822540"
+    "notificationChannel": "default channel for notifications",
+    "primaryGuild": "default server for relaying messages from"
 }
