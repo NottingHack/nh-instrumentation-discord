@@ -72,29 +72,11 @@ module.exports = function () {
 		if (!channel) return;
 		if (channel.name.endsWith('-private')) return;
 
-		let displayName = message.author.displayName.replace("/", "");
-		if (message.content) {
-		    let reparsed = message.content;
-		    let idRegex = /\<@(?<id>[0-9]*)>/g;
-
-		    if (reparsed.match(idRegex)?.length) {
-			guild.members.fetch()
-			    .then(members => {
-				let match;
-				while ((match = idRegex.exec(reparsed)) !== null) {
-				    let id = match.groups.id;
-				    const member = members.find(member => member.user.id == id);
-				    reparsed = reparsed.replace(`<@${id}>`, `@<${member.displayName}>`);
-				}
-
-				this.mqttClient
-				    .publish(`nh/discord/rx/${channel.name}/${displayName}`,
-					     reparsed);
-			    })
-		    } else {
-			this.mqttClient
-			    .publish(`nh/discord/rx/${channel.name}/${displayName}`,
-				     message.content);
+		if (message.cleanContent) {
+		    let displayName = message.author.displayName.replace("/", "");
+		    this.mqttClient
+			.publish(`nh/discord/rx/${channel.name}/${displayName}`,
+				 message.cleanContent);
 		    }
 		}
 		this.mqttClient
