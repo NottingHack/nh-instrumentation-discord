@@ -55,7 +55,8 @@ module.exports = function () {
 			.users.fetch(member.user.id)
 			.catch(console.error)
 			.then(user => {
-			    user.send(message.toString());
+			    user.send(message.toString())
+				.catch(console.error);
 			});
 		});
 	}
@@ -71,12 +72,33 @@ module.exports = function () {
 		if (!channel) return;
 		if (channel.name.endsWith('-private')) return;
 
+		let displayName = message.author.displayName.replace("/", "");
+		if (message.content) {
+		    let reparsed = message.content;
+		    let idRegex = /\<@(?<id>[0-9]*)>/g;
+
+		    if (reparsed.match(idRegex)?.length) {
+			guild.members.fetch()
+			    .then(members => {
+				let match;
+				while ((match = idRegex.exec(reparsed)) !== null) {
+				    let id = match.groups.id;
+				    const member = members.find(member => member.user.id == id);
+				    reparsed = reparsed.replace(`<@${id}>`, `@<${member.displayName}>`);
+				}
+
+				this.mqttClient
+				    .publish(`nh/discord/rx/${channel.name}/${displayName}`,
+					     reparsed);
+			    })
+		    } else {
+			this.mqttClient
+			    .publish(`nh/discord/rx/${channel.name}/${displayName}`,
+				     message.content);
+		    }
+		}
 		this.mqttClient
-		    .publish(`nh/discord/rx/${channel.name}/${message.author.username}`,
-			     message.content);
+		    .publish(`nh/discord/json/rx`, JSON.stringify(message));
 	    });
-
-
     };
-
 };
