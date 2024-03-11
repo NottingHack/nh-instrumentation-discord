@@ -7,16 +7,6 @@ module.exports = function () {
     this.onMqttMessage = (topic, message) => {
 	if (! topic.startsWith('nh/tdb/')) return;
 	this.departures = JSON.parse(message);
-
-	let board = "";
-	this.departures.forEach(row => {
-	    board += row.std.padEnd(6);
-	    board += row.destination.padEnd(32);
-	    board += row.platform.padEnd(4);
-	    board += row.etd;
-	    board += "\n";
-	});
-
     };
 
     this.onDiscordMessage = (message) => {
