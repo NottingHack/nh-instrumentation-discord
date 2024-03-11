@@ -15,6 +15,7 @@ Hello! I'm Nottinghack Bot. Here is a list of commands
 - !battery - obtain battery voltages from LLAP instrumentation
 - !tools - upcoming tool bookings
 - !status - instrumentation status
+- !trains - show a rail departures from Nottingham Railway station
 `);
 	}
     };
