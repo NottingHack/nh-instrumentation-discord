@@ -37,7 +37,9 @@ module.exports = function () {
 				flags: [ 4096 ] // silenced
 			    });
 			})
-			.catch(console.error);
+			.catch(err => {
+			    this.mqttClient.publish(`nh/discord/error`, err)
+			});
 
 		});
 
@@ -56,7 +58,9 @@ module.exports = function () {
 			.catch(console.error)
 			.then(user => {
 			    user.send(message.toString())
-				.catch(console.error);
+				.catch(err => {
+				    this.mqttClient.publish(`nh/discord/error`, err);
+				});
 			});
 		});
 	}
