@@ -81,10 +81,24 @@ module.exports = function () {
 		    this.mqttClient
 			.publish(`nh/discord/rx/${channel.name}/${displayName}`,
 				 message.cleanContent);
-		    }
 		}
-		this.mqttClient
-		    .publish(`nh/discord/json/rx`, JSON.stringify(message));
 	    });
+
+	this.mqttClient
+	    .publish(`nh/discord/json/rx`, JSON.stringify(message));
+    };
+
+    this.onPresenceUpdate = (before, after) => {
+	if (! before || ! after) return;
+	if (! before.hasOwnProperty('status')) return;
+	if (! after.hasOwnProperty('status')) return;
+	if (before.status == after.status) return;
+
+	this.mqttClient
+	    .publish(`nh/discord/presence/${after.user.username}`,
+		     after.status);
+	this.mqttClient
+	    .publish(`nh/discord/avatar/${after.user.username}`,
+		     after.member.displayAvatarURL());
     };
 };
