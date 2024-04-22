@@ -14,7 +14,9 @@ const discordClient = new Client({
 	GatewayIntentBits.Guilds,
 	GatewayIntentBits.GuildMessages,
 	GatewayIntentBits.MessageContent,
-	GatewayIntentBits.GuildMembers
+	GatewayIntentBits.GuildMembers,
+	GatewayIntentBits.DirectMessages,
+	GatewayIntentBits.GuildPresences,
     ],
 });
 
@@ -33,8 +35,20 @@ discordClient.on(Events.MessageCreate, function(message)  {
     });
 });
 
+discordClient.on(Events.PresenceUpdate, function(before, after) {
+    if (! after.user) return;
+    if (after.user.id == BOT_USER_ID) return;
+
+    commands.forEach(command => {
+	if (! command.hasOwnProperty('onPresenceUpdate')) return;
+	command.onPresenceUpdate(before, after);
+    });
+});
+
 
 mqttClient.on('connect', function () {
+    console.log("MQTT connected");
+
     conf.mqttSubscriptions.forEach(topic => {
 	mqttClient.subscribe(topic, e => {
 	    if (!e) return;
