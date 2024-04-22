@@ -82,10 +82,10 @@ module.exports = function () {
 			.publish(`nh/discord/rx/${channel.name}/${displayName}`,
 				 message.cleanContent);
 		}
-	    });
 
-	this.mqttClient
-	    .publish(`nh/discord/json/rx`, JSON.stringify(message));
+		this.mqttClient
+		    .publish(`nh/discord/json/rx`, JSON.stringify(message));
+	    });
     };
 
     this.onPresenceUpdate = (before, after) => {
