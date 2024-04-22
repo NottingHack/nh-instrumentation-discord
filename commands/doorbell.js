@@ -15,6 +15,11 @@ module.exports = function () {
 		    flags: [ 4096 ] // silenced
 		});
 	    });
+
+	this.mqttClient.publish(
+	    'pocsag/send',
+	    `307040|NH Doorbell ${message}`
+	);
     };
 
     this.onDiscordMessage = (message) => {
