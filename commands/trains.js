@@ -6,7 +6,11 @@ module.exports = function () {
 
     this.onMqttMessage = (topic, message) => {
 	if (! topic.startsWith('nh/tdb/')) return;
-	this.departures = JSON.parse(message);
+	try {
+	    this.departures = JSON.parse(message)
+	} catch (e) {
+	    console.log(e);
+	}
     };
 
     this.onDiscordMessage = (message) => {
