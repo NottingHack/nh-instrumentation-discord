@@ -36,5 +36,4 @@ module.exports = function () {
 	message.reply({ embeds: [ battEmbed ]});
 	message.react('🔋');
     };
-
 };
