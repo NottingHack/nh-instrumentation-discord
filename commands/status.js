@@ -4,6 +4,13 @@ module.exports = function () {
     this.services = {};
 
     this.onMqttMessage = (topic, message) => {
+	if (topic.startsWith('nh/status/req')) {
+	    this.mqttClient.publish(
+		'nh/status/res',
+		`Running: Discord`
+	    );
+	}
+
 	if (! topic.startsWith('nh/status/res')) return;
 	this.perodic();
 
