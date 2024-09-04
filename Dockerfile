@@ -10,7 +10,7 @@ COPY config.json /nh-discord/config.json
 COPY entry.sh /nh-discord/entry.sh
 
 RUN cd /nh-discord && \
-    npm install discord.js mqtt @meshtastic/js && \
+    npm install discord.js mqtt @meshtastic/js prom-client express && \
     chmod +x entry.sh
 
 ENTRYPOINT ["/nh-discord/entry.sh"]
