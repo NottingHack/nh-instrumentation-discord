@@ -8,13 +8,13 @@ module.exports = function () {
     const expressApp = express();
 
     const messageCounter = new prometheus.Counter({
-	name: 'discord_messages',
+	name: 'discord_messages_count',
 	help: 'number of messages by channel',
 	labelNames: ['channel']
     });
 
     const presenceGuage = new prometheus.Gauge({
-	name: 'discord_presence',
+	name: 'discord_presence_count',
 	help: 'discord online / away count',
 	labelNames: ['status']
     });
