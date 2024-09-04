@@ -19,6 +19,8 @@
   "dependencies": {
     "@meshtastic/js": "^2.3.7-2",
     "discord.js": "^14.13.0",
-    "mqtt": "^5.0.5"
+    "express": "^4.19.2",
+    "mqtt": "^5.0.5",
+    "prom-client": "^15.1.3"
   }
 }
