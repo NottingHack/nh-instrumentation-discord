@@ -19,14 +19,23 @@ module.exports = function () {
 	labelNames: ['status']
     });
 
+    const mphHistogram = new prometheus.Histogram({
+	name: 'discord_messages_per_hour_count',
+	help: 'the number of discord messages in total sent per hour',
+	buckets: [ 3600 ]
+    });
+
     registry.registerMetric(messageCounter);
     registry.registerMetric(presenceGuage);
+    registry.registerMetric(mphHistogram);
 
     this.onMqttMessage = (topic, message) => {
 
     };
 
     this.onDiscordMessage = (message) => {
+	mphHistogram.observe(1);
+
 	const guild = this.discordClient
 	      .guilds.cache.get(conf.primaryGuild);
 
