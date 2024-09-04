@@ -45,22 +45,27 @@ module.exports = function () {
 	    });
     };
 
-    this.presenceTracker = [];
-
+    this.presenceInitialised = false;
     this.onPresenceUpdate = (before, after) => {
-	if (! before || ! after) return;
+	if (! this.presenceInitialised) {
+	    const guild = this.discordClient.guilds.cache.get(conf.primaryGuild);
+	    const presences = guild.presences.cache;
+	    for  (const [k, v] of presences) {
+		presenceGuage.inc({
+		    status: v.status
+		});
+	    }
+
+	    this.presenceInitialised = true;
+	}
+
 	if (after.guild.id != conf.primaryGuild) return;
-
-	if (! before.hasOwnProperty('status')) return;
 	if (! after.hasOwnProperty('status')) return;
-	if (before.status == after.status) return;
 
-	if (this.presenceTracker.includes(after.user.id)) {
+	if (before) {
 	    presenceGuage.dec({
 		status: before.status
 	    });
-	} else {
-	    this.presenceTracker.push(after.user.id);
 	}
 
 	presenceGuage.inc({
