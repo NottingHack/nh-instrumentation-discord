@@ -17,10 +17,9 @@
   },
   "homepage": "https://github.com/AaronJackson/nh-discord#readme",
   "dependencies": {
-    "@meshtastic/js": "^2.3.7-2",
-    "discord.js": "^14.13.0",
-    "express": "^4.19.2",
-    "mqtt": "^5.0.5",
+    "discord.js": "^14.16.3",
+    "express": "^4.21.2",
+    "mqtt": "^5.10.3",
     "prom-client": "^15.1.3"
   }
 }

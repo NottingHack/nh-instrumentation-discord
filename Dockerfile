@@ -1,16 +1,15 @@
 FROM node:20-alpine
 
-RUN apk update && \
-    apk add --no-cache openssl-dev openssl-libs-static && \
+RUN apk add --no-cache openssl-dev openssl-libs-static && \
     mkdir /nh-discord
 
 COPY commands/ /nh-discord/commands/
 COPY main.js /nh-discord/main.js
-COPY config.json /nh-discord/config.json
 COPY entry.sh /nh-discord/entry.sh
+COPY package*.json /nh-discord/
 
 RUN cd /nh-discord && \
-    npm install discord.js mqtt @meshtastic/js prom-client express && \
+    npm install && \
     chmod +x entry.sh
 
 ENTRYPOINT ["/nh-discord/entry.sh"]
