@@ -1,6 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 const prometheus = require('prom-client');
 const express = require('express');
+const crypto = require('crypto');
 const conf = require('../config.json');
 
 module.exports = function () {
@@ -12,6 +13,12 @@ module.exports = function () {
 	help: 'number of messages by channel',
 	labelNames: ['channel']
     });
+
+    const userMessageCounter = new prometheus.Counter({
+       name: 'discord_messages_user_count',
+       help: 'number of messages by user',
+       labelNames: ['userHash']
+    })
 
     const presenceGuage = new prometheus.Gauge({
 	name: 'discord_presence_count',
@@ -26,6 +33,7 @@ module.exports = function () {
     });
 
     registry.registerMetric(messageCounter);
+    registry.registerMetric(userMessageCounter);
     registry.registerMetric(presenceGuage);
     registry.registerMetric(mphHistogram);
 
@@ -51,6 +59,13 @@ module.exports = function () {
 		messageCounter.inc({
 		    channel: channelName
 		});
+
+		if (message.member?.id) {
+                    let userHash = crypto.createHash('md5').update(message.member.id).digest('hex').substring(0, 8);
+                    userMessageCounter.inc({
+			userHash: userHash
+                    })
+		}
 	    });
     };
 
