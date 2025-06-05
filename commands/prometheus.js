@@ -81,7 +81,7 @@ module.exports = function () {
     this.detectAndCountEmojis = (message) => {
 	if (! message.content) return;
 
-	const emojiRegex = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}]/u;
+	let emojiRegex = /\p{RGI_Emoji}/vg;
 	while ((match = emojiRegex.exec(message.content)) !== null) {
 	    messageEmojiCounter.inc({
 		emoji: match[0]
