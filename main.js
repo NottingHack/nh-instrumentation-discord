@@ -45,6 +45,10 @@ discordClient.on(Events.PresenceUpdate, function(before, after) {
     });
 });
 
+discordClient.on(Events.ThreadCreate, function(thread, isNewThread) {
+    if (isNewThread)
+	thread.join();
+});
 
 mqttClient.on('connect', function () {
     console.log("MQTT connected");
