@@ -18,7 +18,13 @@ module.exports = function () {
        name: 'discord_messages_user_count',
        help: 'number of messages by user',
        labelNames: ['userHash']
-    })
+    });
+
+    const messageEmojiCounter = new prometheus.Counter({
+       name: 'discord_message_emoji_count',
+       help: 'counter per emoji used in discord messages',
+       labelNames: ['emoji']
+    });
 
     const presenceGuage = new prometheus.Gauge({
 	name: 'discord_presence_count',
@@ -34,6 +40,7 @@ module.exports = function () {
 
     registry.registerMetric(messageCounter);
     registry.registerMetric(userMessageCounter);
+    registry.registerMetric(messageEmojiCounter);
     registry.registerMetric(presenceGuage);
     registry.registerMetric(mphHistogram);
 
@@ -60,13 +67,27 @@ module.exports = function () {
 		    channel: channelName
 		});
 
+		this.detectAndCountEmojis(message);
+
 		if (message.member?.id) {
                     let userHash = crypto.createHash('md5').update(message.member.id).digest('hex').substring(0, 8);
                     userMessageCounter.inc({
 			userHash: userHash
-                    })
+                    });
 		}
 	    });
+    };
+
+    this.detectAndCountEmojis = (message) => {
+	if (! message.content) return;
+
+	const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g;
+	while ((match = emojiRegex.exec(message.content)) !== null) {
+	    console.log(`inc ${match[0]}`);
+	    messageEmojiCounter.inc({
+		emoji: match[0]
+	    });
+	}
     };
 
     this.presenceInitialised = false;
@@ -104,5 +125,3 @@ module.exports = function () {
 
     expressApp.listen(8990, () => {});
 };
-
-
