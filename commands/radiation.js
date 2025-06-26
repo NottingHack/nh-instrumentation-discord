@@ -8,7 +8,7 @@ module.exports = function () {
 	if (!topic.startsWith('nh/radiation/')) return;
 
 	const id = topic.replace('nh/radiation/', '');
-	this.cpm[id] = message;
+	this.cpm[id] = message.toString();
     };
 
     this.onDiscordMessage = (message) => {
@@ -21,7 +21,7 @@ module.exports = function () {
 	for (const [k, v] of Object.entries(this.cpm)) {
 	    radiationEmbed.addFields(
 		{ name: k, value: v, inline: true}
-	    )
+	    );
 	};
 
 	message.reply({ embeds: [ radiationEmbed ]});
