@@ -2,7 +2,37 @@ const conf = require('../config.json');
 const charts = require('../charts.js');
 
 module.exports = function () {
+    this.cpm = {};
+    this.discordClient = null;
+
     this.onMqttMessage = (topic, message) => {
+	if (!topic.startsWith('nh/radiation/')) return;
+
+	const id = topic.replace('nh/radiation/', '');
+	this.cpm[id] = message.toString();
+
+	// If above 100cpm, alert Furry Radiological Response Unit
+	if (Number(this.cpm[id]) < 100) return;
+
+	const guild = this.discordClient
+	      .guilds.cache.get(conf.primaryGuild);
+
+	// Get user Ids of FRRU members
+	guild.members.fetch()
+	    .then(members => {
+		const mentions = members.filter(member => conf.FRRUUsersnames.includes(member.user.username))
+		      .map(v => `<@${member.user.id}>`).join(" ");
+		if (!mentions) return;
+		this.discordClient
+		    .channels.fetch(conf.notificationChannel)
+		    .then(channel => {
+			channel.send({
+			    content: `☢️ Unusually high CPM detected in space ☢️ \r\nLast reading: ${this.cpm[id]}\r\n` +
+				`🐾☢️ Alerting Furry Radiological Response Unit 🐾☢️: ${mentions}`,
+			    flags: [ 4096 ] // silenced
+			});
+		    });
+	    });
     };
 
     this.onDiscordMessage = async (message) => {
