@@ -47,19 +47,19 @@ module.exports = function () {
     };
 
     this.onDiscordMessage = (message) => {
-    if (!message.content.startsWith("!radiation")) return;
+	if (!message.content.startsWith("!radiation")) return;
 
-    var radiationEmbed = new EmbedBuilder()
-		.setTitle("Radiation")
-		.setDescription("Here are the last radiation CPM readings in the space.");
+	var radiationEmbed = new EmbedBuilder()
+	    .setTitle("Radiation")
+	    .setDescription("Here are the last radiation CPM readings in the space.");
 
-    for (const [k, v] of Object.entries(this.cpm)) {
-		radiationEmbed.addFields(
+	for (const [k, v] of Object.entries(this.cpm)) {
+	    radiationEmbed.addFields(
 		{ name: k, value: v.cpm, inline: true}
-		);
-    };
+	    );
+	};
 
-    message.reply({ embeds: [ radiationEmbed ]});
-    message.react('☢️');
+	message.reply({ embeds: [ radiationEmbed ]});
+	message.react('☢️');
     };
 };
