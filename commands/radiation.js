@@ -55,7 +55,7 @@ module.exports = function () {
 
     for (const [k, v] of Object.entries(this.cpm)) {
 		radiationEmbed.addFields(
-		{ name: k, value: v, inline: true}
+		{ name: k, value: v.cpm, inline: true}
 		);
     };
 
