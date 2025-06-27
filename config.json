@@ -22,5 +22,6 @@
 	"nh/discord/#"
     ],
     "notificationChannel": "default channel for notifications",
-    "primaryGuild": "default server for relaying messages from"
+    "primaryGuild": "default server for relaying messages from",
+	"FRRUUsersnames": []
 }
