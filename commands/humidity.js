@@ -67,7 +67,6 @@ module.exports = function () {
 			borderColor: conf.colours[colorIdx]
 		    });
 		    colorIdx++;
-		    console.log(chartdef.data.datasets);
 		    if (typeof chartdef.data.labels == 'undefined') {
 			chartdef.data.labels = result.values.map(e => (new Date(Number(e[0])*1000).toLocaleString().split(', ')[1]));
 		    }
@@ -85,7 +84,6 @@ module.exports = function () {
 
 		message.reply({ embeds: [ tempEmbed ], files: [file]});
 		message.react('💦');
-
 	    });
     }
 };
