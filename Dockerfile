@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-RUN apk add --no-cache openssl-dev openssl-libs-static && \
+RUN apk add --no-cache openssl-dev openssl-libs-static fontconfig && \
     mkdir /nh-discord
 
 COPY commands/ /nh-discord/commands/
