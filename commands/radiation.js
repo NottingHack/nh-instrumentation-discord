@@ -1,9 +1,5 @@
-const { EmbedBuilder, AttachmentBuilder } = require('discord.js');
 const conf = require('../config.json');
-
-const {CategoryScale, Chart, LinearScale, LineController, LineElement, PointElement} = require('chart.js');
-const {Canvas} = require('skia-canvas');
-const fsp = require('node:fs/promises');
+const charts = require('../charts.js');
 
 module.exports = function () {
     this.onMqttMessage = (topic, message) => {
@@ -11,14 +7,6 @@ module.exports = function () {
 
     this.onDiscordMessage = async (message) => {
 	if (!message.content.startsWith('!radiation')) return;
-
-	Chart.register([
-	    CategoryScale,
-	    LineController,
-	    LineElement,
-	    LinearScale,
-	    PointElement
-	]);
 
 	const startDate = (Date.now()/1000) - (60*60*24);
 	const endDate = (Date.now()/1000);
@@ -29,62 +17,12 @@ module.exports = function () {
 		return res.json();
 	    })
 	    .then(async res => {
-		let radiation = {};
-
-		for (const result of res.data.result) {
-		    radiation[result.metric.area] = Number(result.values[result.values.length - 1][1]);
-		}
-
-		const values = Object.values(radiation);
-		if (values.length == 0) return; // we're not ready
-
-		const mean = (values.reduce((acc, cur) => acc + cur) / values.length).toFixed(2);
-
-		var tempEmbed = new EmbedBuilder()
-		    .setTitle("Radiation")
-		    .setDescription(`The average radiation is ${mean} cpm.`);
-
-		for (const [k, v] of Object.entries(radiation)) {
-		    tempEmbed.addFields(
-			{ name: k, value: v.toFixed(2) + ' cpm', inline: true}
-		    );
-		};
-
-		const canvas = new Canvas(600, 300);
-		let chartdef =  {
-		    type: 'line',
-		    data: {
-			datasets: []
-		    }
-		};
-
-		let colorIdx = 0;
-		for (const result of res.data.result) {
-		    chartdef.data.datasets.push({
-			label: result.metric.area,
-			data: result.values.map(e => Number(e[1])),
-			pointRadius: 0,
-			borderColor: conf.colours[colorIdx]
-		    });
-		    colorIdx++;
-		    if (typeof chartdef.data.labels == 'undefined') {
-			chartdef.data.labels = result.values.map(e => (new Date(Number(e[0])*1000).toLocaleString().split(', ')[1]));
-		    }
-		}
-		let chart = new Chart(
-		    canvas,
-		    chartdef
-		);
-		const pngBuffer = await canvas.toBuffer('png', {matte: 'white'});
-		await fsp.writeFile('radiation.png', pngBuffer);
-		chart.destroy();
-
-		tempEmbed.setImage('attachment://radiation.png');
-		const file = new AttachmentBuilder('radiation.png');
-
-		message.reply({ embeds: [ tempEmbed ], files: [file]});
+		const mean = await charts.timeseriesToEmbed(message, res, 'Radiation', 'cpm', 'area');
 		message.react('☢️');
-
+	    })
+	    .catch(e => {
+		console.log(e);
+		message.reply('Problem querying prometheus, sorry');
 	    });
     }
 };

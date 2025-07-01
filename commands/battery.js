@@ -1,39 +1,32 @@
-const { EmbedBuilder } = require('discord.js');
 const conf = require('../config.json');
+const charts = require('../charts.js');
 
 module.exports = function () {
-    this.battery = {};
-
     this.onMqttMessage = (topic, message) => {
-	if (!topic.startsWith('nh/llap/messagebridge/listen')) return;
-
-	const payload = JSON.parse(message.toString());
-	if (payload.type != 'WirelessMessage') return;
-	if (payload.data[0].startsWith('BATT')) {
-	    const battery = payload.data[0].replace('BATT', '') + 'v';
-	    var id = payload.id;
-
-	    if (conf.wirelessMap.hasOwnProperty(id))
-		id = conf.wirelessMap[id];
-
-	    this.battery[id] = battery;
-	}
     };
 
-    this.onDiscordMessage = (message) => {
-	if (!message.content.startsWith("!battery")) return;
+    this.onDiscordMessage = async (message) => {
+	if (!message.content.startsWith('!battery')) return;
 
-	var battEmbed = new EmbedBuilder()
-	    .setTitle("LLAP Battery Voltages")
-	    .setDescription("Here is a report of the LLAP instrumentation battery voltages.");
+	const startDate = (Date.now()/1000) - (60*60*24);
+	const endDate = (Date.now()/1000);
+	const query = 'avg_over_time(hms_instrumentation_sensor_battery[30m])';
 
-	for (const [k, v] of Object.entries(this.battery)) {
-	    battEmbed.addFields(
-		{ name: k, value: v, inline: true}
-	    )
-	};
-
-	message.reply({ embeds: [ battEmbed ]});
-	message.react('🔋');
-    };
+	await fetch(`${conf.prometheusApi}/query_range?query=${query}&start=${startDate}&end=${endDate}&step=1000`)
+	    .then(res => {
+		return res.json();
+	    })
+	    .then(async res => {
+		const mean = await charts.timeseriesToEmbed(message, res, 'Wireless Sensor Batteries', 'v', 'sensor');
+		message.react('🔋');
+	    })
+	    .catch(e => {
+		console.log(e);
+		message.reply('Problem querying prometheus, sorry');
+	    });
+    }
 };
+
+
+
+
