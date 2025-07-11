@@ -1,5 +1,5 @@
-const { EmbedBuilder } = require('discord.js');
 const conf = require('../config.json');
+const charts = require('../charts.js');
 
 module.exports = function () {
     this.cpm = {};
@@ -15,7 +15,7 @@ module.exports = function () {
 		};
 
 		// If above 100cpm, alert Furry Radiological Response Unit
-		if (Number(this.cpm[id.cpm]) < 100) return;
+		if (Number(this.cpm[id].cpm) < 100) return;
 
 	    // If there are other reports from the past 2 hours don't alert
 		let twoHourAgo = new Date();
@@ -46,20 +46,24 @@ module.exports = function () {
 		    });
     };
 
-    this.onDiscordMessage = (message) => {
-	if (!message.content.startsWith("!radiation")) return;
+    this.onDiscordMessage = async (message) => {
+	if (!message.content.startsWith('!radiation')) return;
 
-	var radiationEmbed = new EmbedBuilder()
-	    .setTitle("Radiation")
-	    .setDescription("Here are the last radiation CPM readings in the space.");
+	const startDate = (Date.now()/1000) - (60*60*24);
+	const endDate = (Date.now()/1000);
+	const query = 'avg_over_time(radiation[30m])';
 
-	for (const [k, v] of Object.entries(this.cpm)) {
-	    radiationEmbed.addFields(
-		{ name: k, value: v.cpm, inline: true}
-	    );
-	};
-
-	message.reply({ embeds: [ radiationEmbed ]});
-	message.react('☢️');
-    };
+	await fetch(`${conf.prometheusApi}/query_range?query=${query}&start=${startDate}&end=${endDate}&step=1000`)
+	    .then(res => {
+		return res.json();
+	    })
+	    .then(async res => {
+		const mean = await charts.timeseriesToEmbed(message, res, 'Radiation', 'cpm', 'area');
+		message.react('☢️');
+	    })
+	    .catch(e => {
+		console.log(e);
+		message.reply('Problem querying prometheus, sorry');
+	    });
+    }
 };

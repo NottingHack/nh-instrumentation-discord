@@ -1,40 +1,29 @@
-const { EmbedBuilder } = require('discord.js');
 const conf = require('../config.json');
+const charts = require('../charts.js');
 
 module.exports = function () {
-    this.humidity = {};
-
     this.onMqttMessage = (topic, message) => {
-	if (!topic.startsWith('nh/llap/messagebridge/listen')) return;
-
-	const payload = JSON.parse(message.toString());
-	if (payload.type != 'WirelessMessage') return;
-	if (payload.data[0].startsWith('RHUM')) {
-	    const hum = payload.data[0].replace('RHUM', '') + '%';
-	    var id = payload.id;
-
-	    if (conf.wirelessMap.hasOwnProperty(id))
-		id = conf.wirelessMap[id];
-
-	    this.humidity[id] = hum;
-	}
     };
 
-    this.onDiscordMessage = (message) => {
-	if (!message.content.startsWith("!humidity")) return;
+    this.onDiscordMessage = async (message) => {
+	if (!message.content.startsWith('!humidity')) return;
 
-	var humidEmbed = new EmbedBuilder()
-	    .setTitle("Relative Humidity")
-	    .setDescription("Here is a report of the humidity within the hackspace.");
+	const startDate = (Date.now()/1000) - (60*60*24);
+	const endDate = (Date.now()/1000);
+	const query = 'avg_over_time(hms_instrumentation_humidity[30m])';
 
-	for (const [k, v] of Object.entries(this.humidity)) {
-	    humidEmbed.addFields(
-		{ name: k, value: v, inline: true}
-	    )
-	};
+	await fetch(`${conf.prometheusApi}/query_range?query=${query}&start=${startDate}&end=${endDate}&step=1000`)
+	    .then(res => {
+		return res.json();
+	    })
+	    .then(async res => {
+		const mean = await charts.timeseriesToEmbed(message, res, 'Relative Humidity', '%', 'sensor');
 
-	message.reply({ embeds: [ humidEmbed ]});
-	message.react('💦');
-    };
-
+		message.react('💦');
+	    })
+	    .catch(e => {
+		console.log(e);
+		message.reply('Problem querying prometheus, sorry');
+	    });
+    }
 };
