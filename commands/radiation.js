@@ -2,17 +2,18 @@ const conf = require('../config.json');
 const charts = require('../charts.js');
 
 module.exports = function () {
-    this.cpm = {};
     this.discordClient = null;
 
     this.onMqttMessage = (topic, message) => {
 	if (!topic.startsWith('nh/radiation/')) return;
 
+	let cpm = {};
+
 	const id = topic.replace('nh/radiation/', '');
-	this.cpm[id] = message.toString();
+	cpm[id] = message.toString();
 
 	// If above 100cpm, alert Furry Radiological Response Unit
-	if (Number(this.cpm[id]) < 100) return;
+	if (Number(cpm[id]) < 100) return;
 
 	const guild = this.discordClient
 	      .guilds.cache.get(conf.primaryGuild);
@@ -27,7 +28,7 @@ module.exports = function () {
 		    .channels.fetch(conf.notificationChannel)
 		    .then(channel => {
 			channel.send({
-			    content: `☢️ Unusually high CPM detected in space ☢️ \r\nLast reading: ${this.cpm[id]}\r\n` +
+			    content: `☢️ Unusually high CPM detected in space ☢️ \r\nLast reading: ${cpm[id]}\r\n` +
 				`🐾☢️ Alerting Furry Radiological Response Unit 🐾☢️: ${mentions}`,
 			    flags: [ 4096 ] // silenced
 			});
