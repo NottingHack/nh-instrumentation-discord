@@ -29,7 +29,6 @@ Have fun!
 
 	if (raw && raw.length == 84) {
 	    this.mqttClient.publish("nh/flipdot/comfy/raw", raw);
-	    message.reply(
 	} else {
 	    this.mqttClient.publish("nh/flipdot/comfy/text", text);
 	}
