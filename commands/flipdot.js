@@ -9,7 +9,7 @@ module.exports = function () {
 	if (!message.content.startsWith("!flipdot ")) return;
 
 	const text = message.content.replace("!flipdot ", "");
-	if (text.length == 0) {
+	if (text == "help") {
 	    message.reply(`
 Send text or image to the comfy area flipdot display.
 
