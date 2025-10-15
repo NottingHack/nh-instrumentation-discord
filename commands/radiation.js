@@ -2,10 +2,6 @@ const conf = require('../config.json');
 const charts = require('../charts.js');
 
 module.exports = function () {
-<<<<<<< HEAD
-    this.cpm = {};
-=======
->>>>>>> f2cb7fd9aa7292c2e3dbfab7e9a2c2bb1b7015be
     this.discordClient = null;
 
     this.onMqttMessage = (topic, message) => {
@@ -47,18 +43,6 @@ module.exports = function () {
 	const endDate = (Date.now()/1000);
 	const query = 'avg_over_time(radiation[30m])';
 
-<<<<<<< HEAD
-	for (const [k, v] of Object.entries(this.cpm)) {
-	    radiationEmbed.addFields(
-		{ name: k, value: v.cpm, inline: true}
-	    );
-	};
-
-	message.reply({ embeds: [ radiationEmbed ]});
-	message.react('☢️');
-    };
-};
-=======
 	await fetch(`${conf.prometheusApi}/query_range?query=${query}&start=${startDate}&end=${endDate}&step=1000`)
 	    .then(res => {
 		return res.json();
@@ -73,4 +57,3 @@ module.exports = function () {
 	    });
     }
 };
->>>>>>> f2cb7fd9aa7292c2e3dbfab7e9a2c2bb1b7015be
