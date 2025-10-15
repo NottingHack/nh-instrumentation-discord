@@ -5,7 +5,7 @@ module.exports = function () {
     this.discordClient = null;
 
     this.onMqttMessage = (topic, message) => {
-		if (!topic.startsWith('nh/radiation/')) return;
+	if (!topic.startsWith('nh/radiation/')) return;
 
 	let cpm = {};
 
