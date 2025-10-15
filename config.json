@@ -23,5 +23,6 @@
     ],
     "notificationChannel": "default channel for notifications",
     "primaryGuild": "default server for relaying messages from",
-    "FRRUUsersnames": []
+    "FRRUUsersnames": [],
+	"flipdotBabyEmulator": ""
 }
