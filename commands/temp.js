@@ -1,45 +1,38 @@
-const { EmbedBuilder } = require('discord.js');
+const conf = require('../config.json');
+const charts = require('../charts.js');
 
 module.exports = function () {
-    this.temperature = {};
-
     this.onMqttMessage = (topic, message) => {
-	if (!topic.startsWith('nh/temperature/')) return;
-
-	const room = topic.split('/').pop()
-	this.temperature[room] = parseFloat(message.toString());
     };
 
-    this.onDiscordMessage = (message) => {
+    this.onDiscordMessage = async (message) => {
 	if (!message.content.startsWith('!temp')) return;
 
-	const values = Object.values(this.temperature);
-	if (values.length == 0) return; // we're not ready
+	const startDate = (Date.now()/1000) - (60*60*24);
+	const endDate = (Date.now()/1000);
+	const query = 'avg_over_time(hms_instrumentation_temperature[30m])';
 
-	const mean = (values.reduce((acc, cur) => acc + cur) / values.length).toFixed(2);
+	await fetch(`${conf.prometheusApi}/query_range?query=${query}&start=${startDate}&end=${endDate}&step=1000`)
+	    .then(res => {
+		return res.json();
+	    })
+	    .then(async res => {
+		const mean = await charts.timeseriesToEmbed(message, res, 'Temperature', '°c', 'sensor');
 
-	var tempEmbed = new EmbedBuilder()
-	    .setTitle("Temperature")
-	    .setDescription(`The average temperature is ${mean} °c.`);
-
-	for (const [k, v] of Object.entries(this.temperature)) {
-	    tempEmbed.addFields(
-		{ name: k, value: v + ' °c', inline: true}
-	    );
-	};
-
-	message.reply({ embeds: [ tempEmbed ]});
-
-	if (mean > 25)
-	    message.react('🥵');
-	else if (mean > 20)
-	    message.react('😅');
-	else if (mean > 15)
-	    message.react('😊');
-	else if (mean > 5)
-	    message.react('🫤');
-	else
-	    message.react('🥶');
-    };
-
+		if (mean > 25)
+		    message.react('🥵');
+		else if (mean > 20)
+		    message.react('😅');
+		else if (mean > 15)
+		    message.react('😊');
+		else if (mean > 5)
+		    message.react('🫤');
+		else
+		    message.react('🥶');
+	    })
+	    .catch(e => {
+		console.log(e);
+		message.reply('Problem querying prometheus, sorry');
+	    });
+    }
 };
