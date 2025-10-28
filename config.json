@@ -1,4 +1,5 @@
 {
+	"clientId": "",
     "token": "discord token",
     "mqtt": "mqtt://localhost",
     "wirelessMap": {

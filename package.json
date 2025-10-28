@@ -4,7 +4,9 @@
   "description": "A discord bot for nottingham hackspace",
   "main": "main.js",
   "scripts": {
-    "test": "node main.js"
+    "test": "node main.js",
+    "docker-build": "docker build -t nh-discord .",
+    "docker-run": "docker run -v ./config.json:/nh-discord/config.json -it nh-discord:latest"
   },
   "repository": {
     "type": "git",
@@ -17,11 +19,14 @@
   },
   "homepage": "https://github.com/AaronJackson/nh-discord#readme",
   "dependencies": {
+    "canvas": "^3.2.0",
     "chart.js": "^4.5.0",
     "discord.js": "^14.16.3",
     "express": "^4.21.2",
+    "jsdom": "^27.0.1",
     "mqtt": "^5.10.3",
     "prom-client": "^15.1.3",
+    "qr-code-styling": "^1.9.2",
     "skia-canvas": "^2.0.2"
   }
 }
