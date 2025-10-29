@@ -1,4 +1,4 @@
-const { Client, Events, GatewayIntentBits, Routes, REST } = require('discord.js');
+const { Client, Events, GatewayIntentBits, Routes, REST, MessageFlags, AttachmentBuilder} = require('discord.js');
 const conf = require('./config.json');
 
 // override any config keys given as environment variables
@@ -53,6 +53,15 @@ discordClient.on(Events.MessageCreate, function(message)  {
  * Try and match the events up to a command.
  */
 discordClient.on(Events.InteractionCreate, (interaction) => {
+    if (!interaction.member.roles.cache.has(conf.activeMemberRole)){
+        if (interaction.isCommand()) {
+            interaction.reply({
+                content: `Sorry, you must be an active member to execute commands.`,
+                flags: MessageFlags.Ephemeral,
+            });
+        }
+        return;
+    }
     // if the interaction is a button press get the command name from the interaction (todo: is there a better way?)
     try {
         const cmd = slashCommands.find((cmd) => cmd.accept(interaction.commandName ?? interaction.message?.interaction?.commandName));
