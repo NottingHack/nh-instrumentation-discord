@@ -55,22 +55,22 @@ discordClient.on(Events.MessageCreate, function(message)  {
 discordClient.on(Events.InteractionCreate, (interaction) => {
     // if the interaction is a button press get the command name from the interaction (todo: is there a better way?)
     try {
-        const cmd = slashCommands.find((cmd) => cmd.accept(interaction.commandName ?? interaction.message?.interaction?.commandName))
+        const cmd = slashCommands.find((cmd) => cmd.accept(interaction.commandName ?? interaction.message?.interaction?.commandName));
         if (cmd) {
             if (interaction.isAutocomplete()) {
-                cmd.autocomplete(interaction)
+                cmd.autocomplete(interaction);
             } else if (interaction.isButton()) {
-                cmd.handleButton(interaction)
+                cmd.handleButton(interaction);
             } else if (interaction.isCommand()) {
-                cmd.execute(interaction)
+                cmd.execute(interaction);
             } else {
-                console.warn("Unknown interaction type was ignored", interaction.type)
+                console.warn("Unknown interaction type was ignored", interaction.type);
             }
         } else {
-            console.error(`Failed to find command for interaction: ${interaction.commandName} (customId: ${interaction.customId})`)
+            console.error(`Failed to find command for interaction: ${interaction.commandName} (customId: ${interaction.customId})`);
         }
     } catch (err) {
-        console.error(`Failed to handle interaction`, err)
+        console.error(`Failed to handle interaction`, err);
     }
 })
 
