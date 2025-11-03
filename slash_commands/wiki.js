@@ -92,7 +92,7 @@ module.exports = function () {
             rvslots: "*",
         });
 
-        const page = await fetch(`${baseUrl}api.php?${params}`)
+        const pageContent = await fetch(`${baseUrl}api.php?${params}`)
             .then(response => response.json())
             .then(results => {
                 const pages = results.query?.pages
@@ -103,13 +103,13 @@ module.exports = function () {
                 if ((revisions || []).length === 0) {
                     return null;
                 }
-                return revisions[0]?.slots?.main || null;
+                return revisions[0]?.slots?.main?.content || '';
             })
             .catch((err) => {
                 console.error('Failed to fetch wiki page', err);
             })
 
-        if (!page) {
+        if (!pageContent) {
             await interaction.editReply({
                 content: `Sorry, page was not available.`,
                 flags: MessageFlags.Ephemeral,
@@ -117,7 +117,7 @@ module.exports = function () {
             return;
         }
 
-        const toolData = extractToolData(page.content, ['image'])
+        const toolData = extractToolData(pageContent, ['image'])
         const fileName = `${toFileName(pageName)}-qr.png`
         const url = `${baseUrl}wiki/${encodeURI(pageName)}`;
         const qrCodeBuff = await generateQRCode(url, pageName)
@@ -130,7 +130,7 @@ module.exports = function () {
         if (toolData != null) {
             wikiEmbed.setFields(toolData)
         } else {
-            wikiEmbed.setDescription(page.content.length > 512 ? page.content.slice(0, 512) + "..." : page.content)
+            wikiEmbed.setDescription(pageContent.length > 512 ? pageContent.slice(0, 512) + "..." : pageContent)
         }
 
         const actionsRow = new ActionRowBuilder()
