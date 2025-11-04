@@ -1,4 +1,12 @@
-const { MessageFlags, SlashCommandBuilder, EmbedBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder} = require('discord.js');
+const {
+    MessageFlags,
+    SlashCommandBuilder,
+    EmbedBuilder,
+    AttachmentBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    ActionRowBuilder
+} = require('discord.js');
 const {generateQRCode} = require("../lib/qrcode");
 const {extractToolData} = require("../lib/wiki");
 
@@ -14,7 +22,7 @@ module.exports = function () {
     const baseUrl = 'https://wiki.nottinghack.org.uk/'
 
     this.configure = () => {
-        return  (new SlashCommandBuilder()
+        return (new SlashCommandBuilder()
             .setName(commandName)
             .setDescription('Find a wiki page')
             .addStringOption(option =>
@@ -66,6 +74,12 @@ module.exports = function () {
      * Handle slash command.
      */
     this.execute = async (interaction) => {
+
+        // Create "thinking..." response
+        await interaction.deferReply({
+            flags: MessageFlags.Ephemeral,
+        })
+
         const pageName = interaction.options.getString('query');
 
         const params = new URLSearchParams({
@@ -78,13 +92,32 @@ module.exports = function () {
             rvslots: "*",
         });
 
-        const page = await fetch(`${baseUrl}api.php?${params}`)
+        const pageContent = await fetch(`${baseUrl}api.php?${params}`)
             .then(response => response.json())
             .then(results => {
-                return results.query?.pages[0]?.revisions[0]?.slots?.main || {}
+                const pages = results.query?.pages
+                if ((pages || []).length === 0) {
+                    return null;
+                }
+                const revisions = pages[0]?.revisions;
+                if ((revisions || []).length === 0) {
+                    return null;
+                }
+                return revisions[0]?.slots?.main?.content || '';
+            })
+            .catch((err) => {
+                console.error('Failed to fetch wiki page', err);
             })
 
-        const toolData = extractToolData(page.content, ['image'])
+        if (!pageContent) {
+            await interaction.editReply({
+                content: `Sorry, page was not available.`,
+                flags: MessageFlags.Ephemeral,
+            });
+            return;
+        }
+
+        const toolData = extractToolData(pageContent, ['image'])
         const fileName = `${toFileName(pageName)}-qr.png`
         const url = `${baseUrl}wiki/${encodeURI(pageName)}`;
         const qrCodeBuff = await generateQRCode(url, pageName)
@@ -97,7 +130,7 @@ module.exports = function () {
         if (toolData != null) {
             wikiEmbed.setFields(toolData)
         } else {
-            wikiEmbed.setDescription(page.content.length > 512 ? page.content.slice(0, 512)+"..." : page.content)
+            wikiEmbed.setDescription(pageContent.length > 512 ? pageContent.slice(0, 512) + "..." : pageContent)
         }
 
         const actionsRow = new ActionRowBuilder()
@@ -109,7 +142,7 @@ module.exports = function () {
                     .setEmoji('✅')
             );
 
-        await interaction.reply({
+        await interaction.editReply({
             content: `\`Posted by ${interaction.user?.globalName ?? interaction.user?.username ?? 'Unknown'}\``,
             flags: MessageFlags.Ephemeral,
             embeds: [wikiEmbed],
