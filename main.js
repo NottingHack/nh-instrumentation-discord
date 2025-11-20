@@ -1,4 +1,4 @@
-const { Client, Events, GatewayIntentBits, Routes, REST } = require('discord.js');
+const { Client, Events, GatewayIntentBits, Routes, REST, MessageFlags, AttachmentBuilder} = require('discord.js');
 const conf = require('./config.json');
 
 // override any config keys given as environment variables
