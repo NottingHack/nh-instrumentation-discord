@@ -10,7 +10,7 @@ module.exports = function () {
 
 	const startDate = (Date.now()/1000) - (60*60*24);
 	const endDate = (Date.now()/1000);
-	const query = 'avg_over_time(hms_instrumentation_temperature[30m])';
+	const query = 'avg_over_time(hms_instrumentation_temperature{sensor!~"LaserDisplay|LaserNozzle"}[5m])';
 
 	await fetch(`${conf.prometheusApi}/query_range?query=${query}&start=${startDate}&end=${endDate}&step=1000`)
 	    .then(res => {
