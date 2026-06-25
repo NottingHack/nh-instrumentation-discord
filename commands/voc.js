@@ -17,7 +17,7 @@ module.exports = function () {
 		return res.json();
 	    })
 	    .then(async res => {
-		const mean = await charts.timeseriesToEmbed(message, res, 'VOC', '', 'sensor');
+		const mean = await charts.timeseriesToEmbed(message, res, 'VOC', '', 'name');
 
 		if (mean > 380)
 		    message.react('🤢');
