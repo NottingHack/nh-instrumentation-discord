@@ -5,9 +5,7 @@ const {
     ButtonBuilder,
     ButtonStyle,
     ActionRowBuilder,
-    AttachmentBuilder,
 } = require('discord.js');
-const {generateQRCode} = require("../lib/qrcode");
 const {wikiURL, imageUrl, extractPageData, removeImages, fixRelativeLinks} = require("../lib/wiki");
 
 // wtf can parse wikitext to markdown
@@ -156,12 +154,6 @@ module.exports = function () {
                     .setLabel('Post to channel')
                     .setStyle(ButtonStyle.Primary)
                     .setEmoji('✅')
-            ).addComponents(
-                new ButtonBuilder()
-                    .setCustomId('qr-code')
-                    .setLabel('Generate QR Code')
-                    .setStyle(ButtonStyle.Secondary)
-                    .setEmoji('🏁')
             );
 
         await interaction.editReply({
@@ -177,46 +169,17 @@ module.exports = function () {
      */
     this.handleButton = async (interaction) => {
         switch (interaction.customId) {
-            case "qr-code":
-                // update the message with a QR code that links to the page that was selected.
-                const embed = interaction.message.embeds[0];
-                if (!embed) {
-                    await replyError(interaction, "Failed to create QR code, embed not found")
-                    return;
-                }
-                const fileName = `${toFileName(embed.title)}-qr.png`
-                const qrCodeBuff = await generateQRCode(embed.url, embed.title)
-
-                await interaction.deferUpdate();
-                await interaction.editReply({
-                    content: interaction.message.content,
-                    flags: MessageFlags.Ephemeral,
-                    embeds: interaction.message.embeds,
-                    files: [new AttachmentBuilder(qrCodeBuff, {name: fileName})],
-                });
-                break;
             case "post":
                 // post the article without the ephemeral flag.
                 // note: you cannot update a message from ephemeral to non-ephemeral so it must post a new reply.
                 await interaction.reply({
                     content: interaction.message.content,
                     embeds: interaction.message.embeds,
-                    // leave out the QR code if one exists, they can always copy it and send it if they need it.
                 });
                 break;
             default:
                 await replyError(interaction, "Unknown button could not be handled.", {customId: interaction.customId})
         }
-    }
-
-    /**
-     * Create a valid file name from a string.
-     *
-     * @param {string} str
-     * @returns {string}
-     */
-    function toFileName(str) {
-        return str.toLowerCase().replaceAll(/[^0-9a-z]/ig, "-")
     }
 
     /**

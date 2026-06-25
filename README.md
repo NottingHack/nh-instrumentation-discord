@@ -28,7 +28,7 @@ You can get the `primaryGuild` by right-clicking on your server in the discord s
 ### 2. Start prerequisites 
 
 * MQTT
-  * `docker run -it -p 1883:1883 eclipse-mosquitto:latest mosquitto -c /mosquitto-no-auth.conf`
+  * `docker run -it -p 1883:1883 eclipse-mosquitto:latest mosquitto -c /mosquitto-no-auth.conf` (or `npm run dev:mqtt`)
 
 ### 3. Start the bot 
 
@@ -47,3 +47,18 @@ You can override the config by passing secret values as environment variables:
 At this point the local bot will connect to the discord application you configured and function like a normal bot 
 on your private server without needing any privileged access to the production deployment.
 
+Alternatively, start the docker container (can be better as it would behave more similarly to the prod version) using:
+
+`npm run dev:docker-run`
+
+This expects you to create a file called `.env.local` in the root directory containing overrides to the
+config values in a simple list e.g.
+
+```shell
+token=[my token]
+clientId=[my client id]
+primaryGuild=[my test server]
+notificationChannel=[my test channel]
+activeMemberRole=[my test role]
+mqtt=mqtt://[my docker network] 
+```
